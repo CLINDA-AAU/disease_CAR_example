@@ -1,11 +1,16 @@
-Untitled
+Hotspot detection using conditional autoregressive poisson model in R
 ================
 
-## code for hotspot detection
+## Background
 
-This is code for …
+Detecting hotspots of increased incidence in small geographical units is
+usefull in investigating environmental exposures. The challenge is
+determnining when something is increased across an area.
 
 ## Data management
+
+We calculate expected number of women in a parish as the national rate
+times population of each parish. Then the model is fitted.
 
 ``` r
 library(tidyverse)
@@ -43,12 +48,23 @@ geo_sogne$prob_02 <- pnorm(log(1.02),
 
 ### Raw rates
 
+Examining raw rates gives little hints in clusters as small parrishes
+might have high/low rates by change, therefore smoothing using a CAR
+model is adventageous.
+
 ![](README_files/figure-gfm/unnamed-chunk-1-1.png)<!-- -->
 
 ### Smoothed using the CAR model
 
+Using a CAR model greatly reduces the range of rates as outliers are
+penalized.
+
 ![](README_files/figure-gfm/unnamed-chunk-2-1.png)<!-- -->
 
 ### Detected hotspots
+
+If we choose to look for small levels of difference we find increased
+rates of women close to large cities, and in high income areas. This
+makes intutive sense.
 
 ![](README_files/figure-gfm/unnamed-chunk-3-1.png)<!-- -->

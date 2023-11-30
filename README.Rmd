@@ -1,5 +1,5 @@
 ---
-title: "Untitled"
+title: "Hotspot detection using conditional autoregressive poisson model in R"
 output: github_document
 editor_options: 
   chunk_output_type: inline
@@ -9,11 +9,13 @@ editor_options:
 knitr::opts_chunk$set(echo = TRUE, cache = TRUE)
 ```
 
-## code for hotspot detection
+## Background
 
-This is code for ...
+Detecting hotspots of increased incidence in small geographical units is usefull in investigating environmental exposures. The challenge is determnining when something is increased across an area.
 
 ## Data management
+
+We calculate expected number of women in a parish as the national rate times population of each parish. Then the model is fitted.
 
 ```{r datamanagement, message=FALSE, warning=FALSE}
 library(tidyverse)
@@ -51,6 +53,8 @@ geo_sogne$prob_02 <- pnorm(log(1.02),
 
 ### Raw rates 
 
+Examining raw rates gives little hints in clusters as small parrishes might have high/low rates by change, therefore smoothing using a CAR model is adventageous.
+
 ```{r echo=FALSE, fig.height=7, fig.width=10}
 geo_sogne |> ggplot() + 
   geom_sf(aes(fill = women / expected_women), color = NA) +
@@ -59,6 +63,8 @@ geo_sogne |> ggplot() +
 ```
 
 ### Smoothed using the CAR model
+
+Using a CAR model greatly reduces the range of rates as outliers are penalized.
 
 ```{r echo=FALSE, fig.height=7, fig.width=10}
 geo_sogne |> ggplot() + 
@@ -69,6 +75,8 @@ geo_sogne |> ggplot() +
 
 
 ### Detected hotspots
+
+If we choose to look for small levels of difference we find increased rates of women close to large cities, and in high income areas. This makes intutive sense.
 
 ```{r echo=FALSE, fig.height=5, fig.width=10}
 geo_sogne |> pivot_longer(prob_01:prob_02, names_to = "increase", values_to = "val") %>% 
