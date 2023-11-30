@@ -1,10 +1,12 @@
 ---
 title: "Untitled"
 output: github_document
+editor_options: 
+  chunk_output_type: inline
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE, cache = TRUE)
 ```
 
 ## code for hotspot detection
@@ -42,7 +44,7 @@ geo_sogne$prob_02 <- pnorm(log(1.02),
 
 ### Raw rates 
 
-```{r echo=FALSE}
+```{r echo=FALSE, fig.height=7, fig.width=10}
 geo_sogne |> ggplot() + 
   geom_sf(aes(fill = women / expected_women), color = NA) +
   labs(title="Rate of women")
@@ -50,7 +52,7 @@ geo_sogne |> ggplot() +
 
 ### Smoothed using the CAR model
 
-```{r echo=FALSE}
+```{r echo=FALSE, fig.height=7, fig.width=10}
 geo_sogne |> ggplot() + 
   geom_sf(aes(fill = fitted / expected_women), color = NA)+
   labs(title="Smoothed rate of women")
@@ -58,7 +60,7 @@ geo_sogne |> ggplot() +
 
 ### Detected hotspots
 
-```{r echo=FALSE}
+```{r echo=FALSE, fig.height=7, fig.width=10}
 geo_sogne |> ggplot() + 
   geom_sf(aes(fill = prob_02 > 0.95), color = NA) + 
   geom_point(data = geo_sogne %>% filter(prob_02 > 0.95), aes(x = visueltcenter_x, y = visueltcenter_y), size = 7, shape = 21) +
