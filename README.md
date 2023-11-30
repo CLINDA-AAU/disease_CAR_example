@@ -24,11 +24,18 @@ geo_sogne$id <- 1:nrow(geo_sogne)
 fit <- fitme(women ~ 0 + offset(log(expected_women)) + adjacency(1|id), adjMatrix = nbs, 
              data = geo_sogne, family = "poisson", method = "REML")
 
-pred <- predict(fit, variances = list(linpred = TRUE, disp = TRUE, respVar = TRUE))
+pred <- predict(fit, variances = list(linpred = TRUE, 
+                                      disp = TRUE, 
+                                      respVar = TRUE))
 
 geo_sogne$pred <- pred[]
 geo_sogne$fitted <- fitted(fit)
 geo_sogne$pv <- attr(pred, which = "predVar")
+
+geo_sogne$prob_01 <- pnorm(log(1.005), 
+                           mean = log(geo_sogne$pred) - log(geo_sogne$expected_women), 
+                           sd = sqrt(geo_sogne$pv), lower.tail = FALSE)
+
 geo_sogne$prob_02 <- pnorm(log(1.02), 
                            mean = log(geo_sogne$pred) - log(geo_sogne$expected_women), 
                            sd = sqrt(geo_sogne$pv), lower.tail = FALSE)
