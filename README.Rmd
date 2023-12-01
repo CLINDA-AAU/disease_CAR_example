@@ -55,10 +55,10 @@ geo_sogne$prob_02 <- pnorm(log(1.02),
 
 Examining raw rates gives little hints in clusters as small parrishes might have high/low rates by change, therefore smoothing using a CAR model is adventageous.
 
-```{r echo=FALSE, fig.height=7, fig.width=10}
+```{r fig.height=7, fig.width=10}
 geo_sogne |> ggplot() + 
   geom_sf(aes(fill = women / expected_women), color = NA) +
-  labs(title="Rate of women") + 
+  labs(title="Rate ratio of women") + 
   scale_fill_distiller(palette = "RdPu", direction = 1)
 ```
 
@@ -66,10 +66,10 @@ geo_sogne |> ggplot() +
 
 Using a CAR model greatly reduces the range of rates as outliers are penalized.
 
-```{r echo=FALSE, fig.height=7, fig.width=10}
+```{r fig.height=7, fig.width=10}
 geo_sogne |> ggplot() + 
   geom_sf(aes(fill = fitted / expected_women), color = NA)+
-  labs(title="Smoothed rate of women") + 
+  labs(title="Smoothed rate ratio of women") + 
   scale_fill_distiller(palette = "RdPu", direction = 1)
 ```
 
@@ -78,7 +78,7 @@ geo_sogne |> ggplot() +
 
 If we choose to look for small levels of difference we find increased rates of women close to large cities, and in high income areas. This makes intutive sense.
 
-```{r echo=FALSE, fig.height=5, fig.width=10}
+```{r fig.height=5, fig.width=10}
 geo_sogne |> pivot_longer(prob_01:prob_02, names_to = "increase", values_to = "val") %>% 
   ggplot() + 
   geom_sf(aes(fill = val > 0.95), color = NA) + 
