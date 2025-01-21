@@ -1,9 +1,9 @@
-Hotspot detection using conditional autoregressive poisson model in R
+Disease detection using conditional autoregressive poisson model in R
 ================
 
 ## Background
 
-Detecting hotspots of increased incidence in small geographical units is
+Detecting disease hotspots of increased incidence in small geographical units is
 usefull in investigating environmental exposures. The challenge is
 determnining when something is increased across an area.
 
