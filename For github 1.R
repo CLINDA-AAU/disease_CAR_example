@@ -1,30 +1,7 @@
----
-title: "Hotspot detection using conditional autoregressive poisson model in R"
-output: github_document
-editor_options: 
-  chunk_output_type: inline
----
-
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE, cache = FALSE)
-```
-
-## Background
-
-Detecting hotspots of increased incidence in small geographical units is usefull in investigating environmental exposures. The challenge is determnining when something is increased across an area.
-
-## Data management
-
-We calculate expected number of women in a parish as the national rate times population of each parish. Then the model is fitted.
-
-```{r datamanagement, message=FALSE, warning=FALSE}
-#library(CARBayes)
-#library(ape)
 library(tidyverse)
 library(sf)
 library(dagirlite)
 library(spdep)
-
 
 data("geo_sogne")
 
@@ -37,8 +14,8 @@ geo_sogne$id <- 1:nrow(geo_sogne)
 geo_sogne$expected_women <- 
   geo_sogne$population * (sum(geo_sogne$women) / sum(geo_sogne$men) / 2)
 
-# Testing for smoothed irr > 1 + theta with
-theta <- 0.02
+# Testing for smoothed irr >= 1 + theta with
+theta <- 0.005
 
 ## -----------------------------------------------------------------------------
 ## Adjacency matrix - step 1: 
@@ -185,9 +162,9 @@ geo_sogne %>%
 ##------------------------------------------------------------------------------
 
 # Fit Leroux model (using default priors)
-burnin    <- 10000
+burnin    <- 100000
 n_chains  <- 3
-thin      <- 5
+thin      <- 20
 n_samples <- 6000
 
 fit <-                                                                   
@@ -220,44 +197,9 @@ geo <-
     irr_025  = apply(irr, 2, quantile, 0.025), 
     irr_975  = apply(irr, 2, quantile, 0.975), 
     # Posterior prob. of the smoothed IRR > 1+theta
-    prob     = apply(irr, 2, function(x) sum(x > 1 + theta)) / n_samples)
-```
-
-### Raw rates 
-
-Examining raw rates gives little hints in clusters as small parrishes might have high/low rates by change, therefore smoothing using a CAR model is adventageous.
-
-```{r fig.height=7, fig.width=10}
-p1 <- geo |> ggplot() + 
-  geom_sf(aes(fill = women / expected_women), color = NA) +
-  labs(title="Rate ratio of women") + 
-  scale_fill_distiller(palette = "RdPu", direction = 1)
-
-p1
-```
-
-### Smoothed using the CAR model
-
-Using a CAR model greatly reduces the range of rates as outliers are penalized.
-
-```{r fig.height=7, fig.width=10}
-geo |> ggplot() + 
-  geom_sf(aes(fill = irr_mean), color = NA)+
-  labs(title="Smoothed rate ratio of women") + 
-  scale_fill_distiller(palette = "RdPu", direction = 1)
-```
+    prob     = apply(irr, 2, function(x) sum(x >= 1 + theta)) / n_samples)
 
 
-### Detected hotspots
 
-If we choose to look for small levels of difference we find increased rates of women close to large cities, and in high income areas. This makes intutive sense.
 
-```{r fig.height=5, fig.width=10}
-geo |> 
-  ggplot() + 
-  geom_sf(aes(fill = prob > 0.95), color = NA) + 
-  geom_point(data = . %>% filter(prob > 0.95), 
-             aes(x = visueltcenter_x, y = visueltcenter_y), size = 7, shape = 21) +
-  labs(title="Significant clusters of women (2% increase)", x = NULL, y = NULL) + 
-  scale_fill_grey(start = 0.8, end=0.2)
-```
+
